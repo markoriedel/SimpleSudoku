@@ -652,10 +652,19 @@ sub generate {
     $win->configure(-cursor => '');
     
     if(not(defined($lines[0])) ||
-       $lines[0] =~ /TIMEOUT|NOTUNIQUE|NOSOLUTION/){
+       $lines[0] =~ /NOTUNIQUE|NOSOLUTION/){
 	$win->messageBox(-icon => 'error', -type => 'ok',
 			 -title => 'Alert',
 			 -message => 'couldn\'t generate sudoku');
+	return undef;
+    }
+
+    if($lines[0] =~ /TIMEOUT/){
+	$win->messageBox(-icon => 'error', -type => 'ok',
+			 -title => 'Alert',
+			 -message => 
+			 ('couldn\'t generate sudoku' .
+			  ' (timeout, try again)'));
 	return undef;
     }
        
