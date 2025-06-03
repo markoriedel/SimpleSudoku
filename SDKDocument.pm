@@ -71,6 +71,7 @@ sub new {
 	});
     $self->{playb}->{document} = $self;
 
+    $self->{ingen} = 'no';
     $menuFrame->pack();
     
     $self->{digitsel} = 1;
@@ -540,6 +541,8 @@ sub save {
 
 sub eps {
     my $self = shift;
+
+    return undef if $self->{ingen} eq 'yes';
     
     my $filenoext = "untitled$docindex";
     if($self->{needsname} eq 'no'){
@@ -637,6 +640,13 @@ sub generate {
     my $subseed = int(rand(1<<20));
     
     $win->configure(-cursor => 'watch');
+
+    $self->{ingen} = 'yes';
+    
+    $self->{playb}->configure(-state => 'disabled');
+    $self->{cloneb}->configure(-state => 'disabled');
+    $self->{epsb}->configure(-state => 'disabled');
+
     $win->configure(-title => '(computing)' );
     $win->update();
     
@@ -649,6 +659,11 @@ sub generate {
 	. "-r $subseed $guessflag -y $boardtype";
     print "$cmd\n";
     my @lines = `$cmd`;
+
+    $self->{playb}->configure(-state => 'normal');
+    $self->{cloneb}->configure(-state => 'normal');
+    $self->{epsb}->configure(-state => 'normal');
+
     $win->configure(-cursor => '');
     
     if(not(defined($lines[0])) ||
@@ -690,6 +705,7 @@ sub generate {
     	-state => 'normal');
 
     $self->{window}->configure(-title => $self->{filename});
+    $self->{ingen} = 'no';
     
     return 0;
 }
@@ -700,6 +716,8 @@ sub play {
 
     my $win = $self->{window};
 
+    return undef if $self->{ingen} eq 'yes';
+    
     my $cluemx = ${ $self->{mainwin}->{clueref} };
     my $guessw = ${ $self->{mainwin}->{guessworkref} };
     
@@ -824,6 +842,8 @@ sub open {
 sub clone {
     my $self = shift;
     my $mainwin = $self->{mainwin};
+
+    return undef if $self->{ingen} eq 'yes';
     
     my $other = SDKDocument->new($mainwin);
 
