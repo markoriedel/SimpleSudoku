@@ -238,6 +238,35 @@ sub alldeterm {
     return undef;
 }
 
+
+sub oneclue {
+    my $self = shift;
+    my $sol = shift;
+
+    my @options = ();
+    
+    for(my $row=0; $row<9; $row++){
+	for(my $col=0; $col<9; $col++){
+	    my $val = $self->[$row][$col];
+	    if($val == 0){
+		my $poss = $self->onedeterm($row, $col);
+		push @options, 
+		    [ $row, $col, scalar(@$poss)];
+	    }
+	}
+    }
+    
+    return undef if scalar(@options) == 0;
+    
+    my @osorted = sort { $a->[2] <=> $b->[2] } @options;
+    my $clue = $osorted[0];
+
+    return [ $clue->[0], $clue->[1],
+	     $sol->[$clue->[0]][$clue->[1]] ];
+}
+
+
+
 sub iscompat {
     my ($self, $x, $y, $val) = @_;
 

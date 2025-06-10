@@ -400,7 +400,9 @@ sub startPlayPhase {
 	    }
 
 	    my $move = 
-		$merged->alldeterm() || $merged->allcompat();
+		$merged->alldeterm() || 
+		$merged->allcompat() ||
+		$merged->oneclue($self->{solution});
 	    if(defined($move)){
 		splice @{ $self->{play} }, $hpos+1;
 		$nxt->record(@$move);
@@ -889,16 +891,19 @@ sub checkMovePoss {
     if($hpos >= 0){
 	my $agr = $self->{play}[$hpos]->agree($self->{solution});
 	my $merged = $self->{play}[$hpos]->merge($self->{enter});
+
 	$moveposs =
 	    defined($agr) && 
 	    (defined($merged->allcompat()) ||
-	     defined($merged->alldeterm()));
+	     defined($merged->alldeterm()) ||
+	     defined($merged->oneclue($self->{solution})));
     }
     else{
 	$moveposs =
 	    $self->{enter}->occupied() < 81 &&
 	    (defined($self->{enter}->allcompat()) ||
-	     defined($self->{enter}->alldeterm()));
+	     defined($self->{enter}->alldeterm()) ||
+	     defined($self->{enter}->oneclue($self->{solution})));
     }
     
     $self->{moveb}->configure(-state => 
